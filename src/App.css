@@ -1,0 +1,53 @@
+:root {
+  --main-color1: rgb(158, 241, 135);
+  --main-color2: rgb(42, 98, 27);
+  --main-color3: rgb(235, 243, 232);
+}
+
+body {
+  margin: 0;
+  min-width: 300px;
+  background-color: var(--main-color3);
+}
+
+button {
+  border: none;
+  border-radius: 7.5px;
+  padding: 0.4em 0.9em;
+  color: var(--main-color2);
+  background-color: var(--main-color3);
+}
+
+.container {
+  border: black solid 2px;
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 3rem;
+}
+
+.page-header {
+  display: flex;
+  flex-direction: row;
+  padding: 1rem;
+  background-color: var(--main-color1);
+  justify-content: space-between;
+}
+
+.page-header h1 {
+  margin-left: 2rem;
+}
+
+.page-header button {
+  margin: 0.5em;
+}
+
+.page-header #right-side-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 2rem;
+}
+
+.page-header p {
+  margin: auto;
+}
