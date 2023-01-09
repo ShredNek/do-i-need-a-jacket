@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
+import Header from "./Header";
+import MainContainer from "./MainContainer";
 
-interface WeatherData {
+interface IpData {
+  lat: "";
+  lon: "";
+}
+
+interface IndividualWeatherData {
   temp: number;
   feels_like: number;
   humidity: number;
@@ -17,130 +24,189 @@ interface WeatherData {
   dailyMin: number;
 }
 
+interface AllWeatherData {
+  celsius: IndividualWeatherData;
+  fahrenheit: IndividualWeatherData;
+}
+
 interface UiMessages {
   heading: string;
   subheading: string;
   weatherIconDescription: string;
 }
 
+export function toCaps(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 function App() {
-  const [tempMetric, setTempMetric] = useState("Celcius");
-  const [celsiusWeatherDataState, setCelsiusWeatherDataState] =
-    useState<WeatherData>();
-  const [fahrenheitWeatherDataState, FahrenheitWeatherDataState] =
-    useState<WeatherData>();
+  const [tempUnitState, setTempUnitState] = useState("celsius");
+  const [weatherDataState, setWeatherDataState] = useState<AllWeatherData>();
   const [uiMessages, setUiMessages] = useState<UiMessages>();
   const [weatherIconUrl, setWeatherIconUrl] = useState<string>();
 
-  const jacketWorthyTemp = 14;
+  const jacketWorthyTempCelsius = 14;
+  const jacketWorthyTempFahrenheit = 35;
   const jackWorthyRainLevel = 1;
 
-  function uiMessageSetter(rain: number, temp: number, weatherDesc: string) {
-    // ? The ui was in lowercase, which looked ameteur, so
-    // ? I decided to uppercase the first letter in this helper function
-    let newWeatherDesc =
-      weatherDesc.charAt(0).toUpperCase() + weatherDesc.slice(1);
+  function uiMessageSetter(
+    rain: number,
+    temp: number,
+    weatherDesc: string,
+    unit: string
+  ) {
+    let newWeatherDesc = toCaps(weatherDesc);
 
-    rain >= jackWorthyRainLevel && temp < jacketWorthyTemp
-      ? setUiMessages({
-          heading: "Yes, you need a jacket",
-          subheading: "Why you need a jacket",
-          weatherIconDescription: newWeatherDesc,
-        })
-      : setUiMessages({
-          heading: "No, you do not need a jacket",
-          subheading: "Why you don't need a jacket",
-          weatherIconDescription: newWeatherDesc,
-        });
+    if (tempUnitState === "celsius") {
+      rain >= jackWorthyRainLevel && temp < jacketWorthyTempCelsius
+        ? setUiMessages({
+            heading: "Yes, you need a jacket",
+            subheading: "Why you need a jacket...",
+            weatherIconDescription: newWeatherDesc,
+          })
+        : setUiMessages({
+            heading: "No, you do not need a jacket",
+            subheading: "Why you don't need a jacket...",
+            weatherIconDescription: newWeatherDesc,
+          });
+      return;
+    }
+    if (tempUnitState === "fahrenheit") {
+      rain >= jackWorthyRainLevel && temp < jacketWorthyTempFahrenheit
+        ? setUiMessages({
+            heading: "Yes, you need a jacket",
+            subheading: "Why you need a jacket...",
+            weatherIconDescription: newWeatherDesc,
+          })
+        : setUiMessages({
+            heading: "No, you do not need a jacket",
+            subheading: "Why you don't need a jacket...",
+            weatherIconDescription: newWeatherDesc,
+          });
+      return;
+    }
   }
 
-  function setCelsiusData() {}
+  async function setIndividialUnitWeatherData(units: string, ipData: IpData) {
+    let finalObject;
 
-  function mamothFunction() {
-    axios.get("http://ip-api.com/json/").then((res) => {
-      let ipDataRes = res.data;
-      axios
-        .get(
-          `https://api.openweathermap.org/data/2.5/onecall?lat=${ipDataRes.lat}&lon=${ipDataRes.lon}&exclude=hourly,minutely&units=${tempMetric}&appid=5c892443551065aa4bd7819d94ccffcd`
-        )
-        .then((res) => {
-          console.log(res);
+    await axios
+      .get(
+        `https://api.openweathermap.org/data/2.5/onecall?lat=${ipData.lat}&lon=${ipData.lon}&exclude=hourly,minutely&units=${units}&appid=5c892443551065aa4bd7819d94ccffcd`
+      )
+      .then((res) => {
+        const { temp, feels_like, humidity, wind_speed, clouds } =
+          res.data.current;
+        const { description, icon } = res.data.current.weather[0];
+        const { max, min } = res.data.daily[0].temp;
+        let currentRain;
+        res.data.current.rain !== undefined
+          ? (currentRain = res.data.current.rain)
+          : (currentRain = 0);
 
-          const { temp, feels_like, humidity, wind_speed, clouds } =
-            res.data.current;
-          const { description, icon } = res.data.current.weather[0];
-          const { max, min } = res.data.daily[0].temp;
-          let currentRain;
-          res.data.current.rain !== undefined
-            ? (currentRain = res.data.current.rain)
-            : (currentRain = 0);
+        finalObject = {
+          temp: Math.round(temp),
+          feels_like: Math.round(feels_like),
+          humidity: humidity,
+          wind_speed: wind_speed,
+          clouds: clouds,
+          rain: currentRain,
+          imageDetails: {
+            description: description,
+            icon: icon,
+          },
+          dailyMax: Math.round(max),
+          dailyMin: Math.round(min),
+        };
+      });
+    return finalObject;
+  }
 
-          setCelsiusWeatherDataState({
-            temp: Math.round(temp),
-            feels_like: Math.round(feels_like),
-            humidity: humidity,
-            wind_speed: wind_speed,
-            clouds: clouds,
-            rain: currentRain,
-            imageDetails: {
-              description: description,
-              icon: icon,
-            },
-            dailyMax: Math.round(max),
-            dailyMin: Math.round(min),
-          });
+  async function setAllWeatherData(ipData: IpData) {
+    let tempData: AllWeatherData;
 
-          uiMessageSetter(currentRain, temp, description);
-          setWeatherIconUrl(`http://openweathermap.org/img/wn/${icon}@2x.png`);
-        });
+    const celsius = await setIndividialUnitWeatherData("metric", ipData);
+    const fahrenheit = await setIndividialUnitWeatherData("imperial", ipData);
+
+    tempData = { celsius: celsius!, fahrenheit: fahrenheit! };
+    setWeatherDataState(tempData);
+    return tempData;
+  }
+
+  function checkUnitsAndSetUi(
+    tempUnitState: string,
+    weatherData: AllWeatherData
+  ) {
+    switch (tempUnitState) {
+      case "celsius":
+        uiMessageSetter(
+          weatherData.celsius.rain,
+          weatherData.celsius.temp,
+          weatherData.celsius.imageDetails.description,
+          "celsius"
+        );
+      case "fahrenheit":
+        uiMessageSetter(
+          weatherData.celsius.rain,
+          weatherData.celsius.temp,
+          weatherData.celsius.imageDetails.description,
+          "fahrenheit"
+        );
+    }
+  }
+
+  function startApplication() {
+    axios.get("http://ip-api.com/json/").then(async (res) => {
+      await setAllWeatherData(res.data).then((sortedData) => {
+        checkUnitsAndSetUi(tempUnitState, sortedData);
+        setWeatherIconUrl(
+          `http://openweathermap.org/img/wn/${sortedData.celsius.imageDetails.icon}@2x.png`
+        );
+      });
     });
   }
 
   useEffect(() => {
-    mamothFunction();
-  }, [tempMetric]);
+    startApplication();
+  }, [tempUnitState]);
 
   return (
     <div className="App">
-      <nav className="page-header">
-        <h1>Do I Need A Jacket?</h1>
-        <div id="right-side-container">
-          <div id="button-container">
-            <button
-              onClick={() => {
-                setTempMetric("Celcius");
-                mamothFunction();
-              }}
-            >
-              Celsius
-            </button>
-            <button
-              onClick={() => {
-                setTempMetric("Fahrenheit");
-                mamothFunction();
-              }}
-            >
-              Fahrenheit
-            </button>
-          </div>
-          <p>Current setting: {tempMetric}</p>
+      <Header currentUnitState={tempUnitState}>
+        <div id="button-container">
+          <button onClick={() => setTempUnitState("celsius")}>Celsius</button>
+          <button onClick={() => setTempUnitState("fahrenheit")}>
+            Fahrenheit
+          </button>
         </div>
-      </nav>
-      <div className="container" id="main-container">
-        <h2>{uiMessages?.heading}</h2>
-      </div>
+      </Header>
+      <MainContainer uiText={uiMessages?.heading}></MainContainer>
       <div className="container" id="weather-details">
-        <h3>{uiMessages?.subheading}</h3>
-        <h2>
-          {celsiusWeatherDataState?.temp}° {}
-        </h2>
-        <img src={weatherIconUrl} alt="icon for today's weather" />
-        <h3>{uiMessages?.weatherIconDescription}</h3>
-        <div>
-          <h4>High: {celsiusWeatherDataState?.dailyMax}</h4>
-          <h4>Low: {celsiusWeatherDataState?.dailyMin}</h4>
-        </div>
-        <pre>{JSON.stringify(celsiusWeatherDataState, null, 2)}</pre>
+        {tempUnitState === "celsius" ? (
+          <>
+            <h3>{uiMessages?.subheading}</h3>
+            <h2>
+              {weatherDataState?.celsius.temp}° {}
+            </h2>
+            <img src={weatherIconUrl} alt="icon for today's weather" />
+            <h3>{uiMessages?.weatherIconDescription}</h3>
+            <div>
+              <h4>Hi: {weatherDataState?.celsius.dailyMax}</h4>
+              <h4>Lo: {weatherDataState?.celsius.dailyMin}</h4>
+            </div>
+            <h4>Feels like:</h4>
+            <p>{weatherDataState?.celsius.feels_like}</p>
+            <pre>{JSON.stringify(weatherDataState, null, 2)}</pre>
+          </>
+        ) : tempUnitState === "fahrenheit" ? (
+          <>
+            <h2>Fahrenheit</h2>
+          </>
+        ) : (
+          <>
+            <h2>unforseen error</h2>
+          </>
+        )}
       </div>
     </div>
   );
