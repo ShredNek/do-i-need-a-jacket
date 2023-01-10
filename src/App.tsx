@@ -99,7 +99,7 @@ function App() {
 
     await axios
       .get(
-        `https://api.openweathermap.org/data/2.5/onecall?lat=${ipData.lat}&lon=${ipData.lon}&exclude=hourly,minutely&units=${units}&appid=5c892443551065aa4bd7819d94ccffcd`
+        `http://api.openweathermap.org/data/2.5/onecall?lat=${ipData.lat}&lon=${ipData.lon}&exclude=hourly,minutely&units=${units}&appid=5c892443551065aa4bd7819d94ccffcd`
       )
       .then((res) => {
         const { temp, feels_like, humidity, wind_speed, clouds } =
