@@ -1,7 +1,7 @@
 import React from "react";
 import { UiMessages, AllWeatherData } from "./App";
-import "./App.css";
-import "./MainAndWeatherDetailsContainers.css";
+import "./styles/App.css";
+import "./styles/MainAndWeatherDetailsContainers.css";
 
 interface WeatherDetailsContainer {
   tempUnitState: string;

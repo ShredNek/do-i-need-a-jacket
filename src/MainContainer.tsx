@@ -1,6 +1,6 @@
 import React from "react";
-import "./App.css";
-import "./MainAndWeatherDetailsContainers.css";
+import "./styles/App.css";
+import "./styles/MainAndWeatherDetailsContainers.css";
 import { BsFillCheckCircleFill, BsFillXCircleFill } from "react-icons/bs";
 
 interface MainContainer {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import "./App.css";
+import "./styles/App.css";
 import Header from "./Header";
 import MainContainer from "./MainContainer";
 import WeatherDetailsContainer from "./WeatherDetailsContainer";

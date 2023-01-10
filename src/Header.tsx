@@ -1,6 +1,6 @@
 import React from "react";
-import "./App.css";
-import "./Divider.css";
+import "./styles/App.css";
+import "./styles/Divider.css";
 
 interface Header {
   children: JSX.Element;
