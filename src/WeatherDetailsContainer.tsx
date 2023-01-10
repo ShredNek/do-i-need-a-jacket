@@ -1,5 +1,5 @@
 import React from "react";
-import { UiMessages, AllWeatherData } from "./App";
+import { UiMessages, AllWeatherData } from "./interfaces";
 import "./styles/App.css";
 import "./styles/MainAndWeatherDetailsContainers.css";
 
