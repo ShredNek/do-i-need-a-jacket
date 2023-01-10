@@ -1,53 +1,135 @@
+@font-face {
+  font-family: Exo;
+  src: url(./assets/fonts/Exo-Thin.ttf);
+  font-style: normal;
+  font-weight: 300;
+}
+@font-face {
+  font-family: Exo;
+  src: url(./assets/fonts/Exo-Regular.ttf);
+  font-style: normal;
+  font-weight: 600;
+}
+@font-face {
+  font-family: Exo;
+  src: url(./assets/fonts/Exo-SemiBold.ttf);
+  font-style: normal;
+  font-weight: 900;
+}
+@font-face {
+  font-family: Exo;
+  src: url(./assets/fonts/Exo-ThinItalic.ttf);
+  font-style: italic;
+  font-weight: 300;
+}
+@font-face {
+  font-family: Exo;
+  src: url(./assets/fonts/Exo-Italic.ttf);
+  font-style: italic;
+  font-weight: 600;
+}
+@font-face {
+  font-family: Exo;
+  src: url(./assets/fonts/Exo-SemiBoldItalic.ttf);
+  font-style: italic;
+  font-weight: 900;
+}
+
 :root {
-  --main-color1: rgb(158, 241, 135);
-  --main-color2: rgb(42, 98, 27);
-  --main-color3: rgb(235, 243, 232);
+  --main-color1: #23ac60;
+  --main-color2: rgb(255, 255, 255);
+  --main-color3: rgb(10, 86, 60);
+  --main-color4: #9b9b9b;
+  --main-color5: #2f3f3c;
+  --distance-from-side: 3.5rem;
+  --default-border-radius: 10px;
+}
+
+:focus {
+  outline: none;
+}
+
+* {
+  font-family: Exo;
+  font-weight: 600;
+  color: var(--main-color2);
+  border-color: var(--main-color2);
 }
 
 body {
   margin: 0;
-  min-width: 300px;
+  min-width: 425px;
   background-color: var(--main-color3);
 }
 
 button {
   border: none;
   border-radius: 7.5px;
-  padding: 0.4em 0.9em;
+  padding: 6px 12px;
   color: var(--main-color2);
   background-color: var(--main-color3);
 }
 
 .container {
-  border: black solid 2px;
-  border-radius: 10px;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: var(--default-border-radius);
   padding: 1rem;
   margin: 3rem;
 }
 
 .page-header {
   display: flex;
+  height: 100px;
+  align-items: center;
   flex-direction: row;
-  padding: 1rem;
   background-color: var(--main-color1);
   justify-content: space-between;
 }
 
 .page-header h1 {
-  margin-left: 2rem;
+  display: flex;
+  margin-left: var(--distance-from-side);
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--main-color2);
+}
+
+.page-header #button-container {
+  display: flex;
+  margin: 1rem;
+  flex-direction: row;
+  align-items: center;
+  margin-right: 2.5rem;
+  min-width: 120px;
+  height: 60px;
 }
 
 .page-header button {
-  margin: 0.5em;
+  margin: 0.7rem;
 }
 
-.page-header #right-side-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-right: 2rem;
+.page-header button:focus {
+  background-color: var(--main-color2);
+  color: var(--main-color3);
+  transition: background-color 300ms ease-in-out;
 }
 
-.page-header p {
-  margin: auto;
+.fader {
+  position: relative;
+  height: 20px;
+}
+
+@media (max-width: 750px) {
+  .page-header h1 {
+    font-size: 2rem;
+  }
+
+  .page-header {
+    min-height: 160px;
+  }
+  .page-header #button-container {
+    flex-direction: column;
+    justify-content: center;
+  }
 }

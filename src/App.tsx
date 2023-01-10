@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import "./App.css";
 import Header from "./Header";
 import MainContainer from "./MainContainer";
+import WeatherDetailsContainer from "./WeatherDetailsContainer";
+import LoadingScreen from "./LoadingScreen";
 
 interface IpData {
   lat: "";
@@ -24,12 +26,13 @@ interface IndividualWeatherData {
   dailyMin: number;
 }
 
-interface AllWeatherData {
+export interface AllWeatherData {
   celsius: IndividualWeatherData;
   fahrenheit: IndividualWeatherData;
 }
 
-interface UiMessages {
+export interface UiMessages {
+  jacket: boolean;
   heading: string;
   subheading: string;
   weatherIconDescription: string;
@@ -58,29 +61,33 @@ function App() {
     let newWeatherDesc = toCaps(weatherDesc);
 
     if (tempUnitState === "celsius") {
-      rain >= jackWorthyRainLevel && temp < jacketWorthyTempCelsius
+      rain >= jackWorthyRainLevel || temp < jacketWorthyTempCelsius
         ? setUiMessages({
-            heading: "Yes, you need a jacket",
-            subheading: "Why you need a jacket...",
+            jacket: true,
+            heading: "Yes, you need a jacket today.",
+            subheading: "Here's why you need a jacket...",
             weatherIconDescription: newWeatherDesc,
           })
         : setUiMessages({
-            heading: "No, you do not need a jacket",
-            subheading: "Why you don't need a jacket...",
+            jacket: false,
+            heading: "No, you do not need a jacket today.",
+            subheading: "Here's why you don't need a jacket...",
             weatherIconDescription: newWeatherDesc,
           });
       return;
     }
     if (tempUnitState === "fahrenheit") {
-      rain >= jackWorthyRainLevel && temp < jacketWorthyTempFahrenheit
+      rain >= jackWorthyRainLevel || temp < jacketWorthyTempFahrenheit
         ? setUiMessages({
-            heading: "Yes, you need a jacket",
-            subheading: "Why you need a jacket...",
+            jacket: true,
+            heading: "Yes, you need a jacket today.",
+            subheading: "Here's why you need a jacket...",
             weatherIconDescription: newWeatherDesc,
           })
         : setUiMessages({
-            heading: "No, you do not need a jacket",
-            subheading: "Why you don't need a jacket...",
+            jacket: false,
+            heading: "No, you do not need a jacket today.",
+            subheading: "Here's why you don't need a jacket...",
             weatherIconDescription: newWeatherDesc,
           });
       return;
@@ -166,46 +173,60 @@ function App() {
     });
   }
 
+  const celsiusButton = useRef<HTMLButtonElement>(null);
+  const fahrenheitButton = useRef<HTMLButtonElement>(null);
+
+  function focusOnButton(ref: React.RefObject<HTMLButtonElement>) {
+    ref.current?.focus();
+  }
+
   useEffect(() => {
     startApplication();
-  }, [tempUnitState]);
+    celsiusButton.current?.focus();
+  }, []);
 
   return (
     <div className="App">
-      <Header currentUnitState={tempUnitState}>
+      <Header>
         <div id="button-container">
-          <button onClick={() => setTempUnitState("celsius")}>Celsius</button>
-          <button onClick={() => setTempUnitState("fahrenheit")}>
+          <button
+            onClick={() => {
+              setTempUnitState("celsius");
+              focusOnButton(celsiusButton);
+            }}
+            id={"celsius-selector"}
+            ref={celsiusButton}
+          >
+            Celsius
+          </button>
+          <button
+            onClick={() => {
+              setTempUnitState("fahrenheit");
+              focusOnButton(fahrenheitButton);
+            }}
+            id={"fahrenheit-selector"}
+            ref={fahrenheitButton}
+          >
             Fahrenheit
           </button>
         </div>
       </Header>
-      <MainContainer uiText={uiMessages?.heading}></MainContainer>
-      <div className="container" id="weather-details">
-        {tempUnitState === "celsius" ? (
+      <div className="containers">
+        {weatherDataState !== undefined ? (
           <>
-            <h3>{uiMessages?.subheading}</h3>
-            <h2>
-              {weatherDataState?.celsius.temp}° {}
-            </h2>
-            <img src={weatherIconUrl} alt="icon for today's weather" />
-            <h3>{uiMessages?.weatherIconDescription}</h3>
-            <div>
-              <h4>Hi: {weatherDataState?.celsius.dailyMax}</h4>
-              <h4>Lo: {weatherDataState?.celsius.dailyMin}</h4>
-            </div>
-            <h4>Feels like:</h4>
-            <p>{weatherDataState?.celsius.feels_like}</p>
-            <pre>{JSON.stringify(weatherDataState, null, 2)}</pre>
-          </>
-        ) : tempUnitState === "fahrenheit" ? (
-          <>
-            <h2>Fahrenheit</h2>
+            <MainContainer
+              uiText={uiMessages?.heading}
+              jacket={uiMessages?.jacket}
+            ></MainContainer>
+            <WeatherDetailsContainer
+              tempUnitState={tempUnitState}
+              uiMessages={uiMessages}
+              weatherDataState={weatherDataState}
+              weatherIconUrl={weatherIconUrl}
+            ></WeatherDetailsContainer>
           </>
         ) : (
-          <>
-            <h2>unforseen error</h2>
-          </>
+          <LoadingScreen></LoadingScreen>
         )}
       </div>
     </div>
