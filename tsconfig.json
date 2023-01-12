@@ -14,8 +14,11 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "typeRoots": ["src/enviroment.d.ts", "./node_modules/@types"],
+    "types": ["vite/client"]
   },
-  "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": ["src", "src/enviroment.d.ts", "src/config.ts"],
+  "references": [{ "path": "./tsconfig.node.json" }],
+  "typeRoots": ["./global.d.ts", "./node_modules/@types"]
 }
