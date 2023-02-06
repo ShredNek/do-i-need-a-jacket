@@ -16,6 +16,10 @@ const WeatherDetailsContainer: React.FC<WeatherDetailsContainer> = ({
   weatherDataState,
   weatherIconUrl,
 }: WeatherDetailsContainer) => {
+  console.log(weatherDataState);
+
+  // if (typeof weatherDataState !== weatherDataState) {
+  // }
   return (
     <div className="container" id="weather-details">
       {tempUnitState === "celsius" ? (

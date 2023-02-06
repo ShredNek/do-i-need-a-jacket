@@ -1,10 +1,5 @@
 import axios from "axios";
-import {
-  IpData,
-  IndividualWeatherData,
-  AllWeatherData,
-  UiMessages,
-} from "./interfaces";
+import { IpData, AllWeatherData } from "./interfaces";
 
 export async function getIp() {
   let ip;
@@ -16,9 +11,14 @@ export async function getIp() {
 
 export async function getLatLon(ip: string) {
   let latLonData;
-  await axios.get(`https://ipwho.is/${ip}`).then((res) => {
-    latLonData = { lat: res.data.latitude, lon: res.data.longitude };
-  });
+  await axios
+    .get(`https://ipapi.co/${ip}/json/`)
+    .then((res) => {
+      console.log(res);
+
+      latLonData = { lat: res.data.latitude, lon: res.data.longitude };
+    })
+    .catch((err) => console.error(err));
   return latLonData;
 }
 
@@ -33,7 +33,7 @@ export async function setIndividialUnitWeatherData(
       `https://api.openweathermap.org/data/2.5/onecall?lat=${ipData.lat}&lon=${
         ipData.lon
       }&exclude=hourly,minutely&units=${units}&appid=${
-        import.meta.env.VITE_KEY
+        import.meta.env.VITE_WEATHER_API_KEY
       }`
     )
     .then((res) => {
@@ -42,6 +42,9 @@ export async function setIndividialUnitWeatherData(
       const { description, icon } = res.data.current.weather[0];
       const { max, min } = res.data.daily[0].temp;
       let currentRain;
+      if (typeof res.data.current.rain === "object") {
+        currentRain = res.data.current.rain["1h"];
+      }
       res.data.current.rain !== undefined
         ? (currentRain = res.data.current.rain)
         : (currentRain = 0);
