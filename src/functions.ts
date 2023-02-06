@@ -14,8 +14,6 @@ export async function getLatLon(ip: string) {
   await axios
     .get(`https://ipapi.co/${ip}/json/`)
     .then((res) => {
-      console.log(res);
-
       latLonData = { lat: res.data.latitude, lon: res.data.longitude };
     })
     .catch((err) => console.error(err));

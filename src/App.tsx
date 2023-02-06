@@ -21,8 +21,8 @@ function App() {
   const [uiMessages, setUiMessages] = useState<UiMessages>();
   const [weatherIconUrl, setWeatherIconUrl] = useState<string>();
 
-  const jacketWorthyTempCelsius = 21;
-  const jacketWorthyTempFahrenheit = 58;
+  const jacketWorthyTempCelsius = 20;
+  const jacketWorthyTempFahrenheit = 70;
   const jackWorthyRainLevel = 0.5;
 
   async function startApplication() {
